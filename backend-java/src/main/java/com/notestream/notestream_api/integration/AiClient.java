@@ -1,4 +1,4 @@
-package com.notestream.notestream_api.client;
+package com.notestream.notestream_api.integration;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;

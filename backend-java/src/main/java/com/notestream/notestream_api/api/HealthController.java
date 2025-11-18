@@ -1,4 +1,4 @@
-package com.notestream.notestream_api.controller;
+package com.notestream.notestream_api.api;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
