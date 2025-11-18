@@ -1,0 +1,25 @@
+spring:
+  application:
+    name: notestream-api
+  
+  datasource:
+    url: jdbc:postgresql://localhost:5432/notestream
+    username: postgres
+    password: postgres
+    driver-class-name: org.postgresql.Driver
+  
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+    show-sql: true
+
+server:
+  port: 8080
+
+
+ai:
+  service:
+    url: http://localhost:8000
