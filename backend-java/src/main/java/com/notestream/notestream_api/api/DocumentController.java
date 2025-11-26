@@ -15,6 +15,7 @@ import java.util.Map;
 @RequestMapping("/api")
 public class DocumentController {
 
+    private static final long MAX_UPLOAD_BYTES = 10 * 1024 * 1024; // 10 MB
     private final DocumentIngestionService documentIngestionService;
 
     public DocumentController(DocumentIngestionService documentIngestionService) {
@@ -32,9 +33,15 @@ public class DocumentController {
                     .body(Map.of("error", "File is empty"));
         }
 
-        if (!file.getContentType().equals("application/pdf")) {
+        String contentType = file.getContentType();
+        if (contentType == null || !contentType.toLowerCase().startsWith("application/pdf")) {
             return ResponseEntity.badRequest()
                     .body(Map.of("error", "Only PDF files are allowed"));
+        }
+
+        if (file.getSize() > MAX_UPLOAD_BYTES) {
+            return ResponseEntity.badRequest()
+                    .body(Map.of("error", "File too large. Maximum size is 10 MB."));
         }
 
         try {

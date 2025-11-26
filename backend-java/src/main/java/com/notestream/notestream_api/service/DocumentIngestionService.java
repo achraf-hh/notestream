@@ -14,6 +14,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @Service
 public class DocumentIngestionService {
@@ -50,25 +51,17 @@ public class DocumentIngestionService {
                 file.getSize(),
                 course
         );
-        document = documentRepository.save(document);
+        final Document savedDocument = documentRepository.save(document);
 
-        // 3. Extract text from PDF
-        String text = pdfParsingService.extractText(file);
+        // 3. Stream text chunks directly from the PDF and persist as we go to avoid heap blowups
+        final AtomicInteger position = new AtomicInteger(0);
+        pdfParsingService.streamChunks(file, chunkText ->
+                chunkRepository.save(new Chunk(chunkText, position.getAndIncrement(), savedDocument)));
 
-        // 4. Split into chunks
-        List<String> chunkTexts = pdfParsingService.splitIntoChunks(text);
+        // TODO: Step 4 - Revisit embeddings: either batch chunks or stream to aiClient.embed()
+        // and persist embeddings alongside chunk content.
 
-        // 5. Create chunk entities (without embeddings for now)
-        for (int i = 0; i < chunkTexts.size(); i++) {
-            Chunk chunk = new Chunk(chunkTexts.get(i), i, document);
-            chunkRepository.save(chunk);
-        }
-
-        // TODO: Step 4 - Call aiClient.embed() to get embeddings
-        // List<float[]> embeddings = aiClient.embed(chunkTexts);
-        // Then update each chunk with its embedding
-
-        return document;
+        return savedDocument;
     }
 
     public Document getDocument(Long documentId) {
