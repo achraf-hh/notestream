@@ -1,7 +1,9 @@
 package com.notestream.notestream_api.api;
 
+import com.notestream.notestream_api.domain.model.Chunk;
 import com.notestream.notestream_api.domain.model.Document;
 import com.notestream.notestream_api.service.DocumentIngestionService;
+import com.notestream.notestream_api.domain.repository.DocumentRepository;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -17,9 +19,11 @@ public class DocumentController {
 
     private static final long MAX_UPLOAD_BYTES = 10 * 1024 * 1024; // 10 MB
     private final DocumentIngestionService documentIngestionService;
+    private final DocumentRepository documentRepository;
 
-    public DocumentController(DocumentIngestionService documentIngestionService) {
+    public DocumentController(DocumentIngestionService documentIngestionService, DocumentRepository documentRepository) {
         this.documentIngestionService = documentIngestionService;
+        this.documentRepository = documentRepository;
     }
 
     @PostMapping("/courses/{courseId}/documents")
@@ -65,6 +69,13 @@ public class DocumentController {
         List<Document> documents = documentIngestionService.getDocumentsByCourse(courseId);
         return ResponseEntity.ok(documents);
     }
+
+    @GetMapping("/documents/{documentId}/chunks")
+public ResponseEntity<List<Chunk>> getChunks(@PathVariable Long documentId) {
+    Document document = documentRepository.findById(documentId)
+        .orElseThrow(() -> new RuntimeException("Document not found"));
+    return ResponseEntity.ok(document.getChunks());
+}
 
     @GetMapping("/documents/{documentId}")
     public ResponseEntity<Document> getDocument(@PathVariable Long documentId) {
