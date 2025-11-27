@@ -6,6 +6,7 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
 
 import java.time.LocalDateTime;
@@ -42,6 +43,7 @@ public class Document {
 
     @OneToMany(mappedBy = "document", cascade = CascadeType.ALL, orphanRemoval = true)
     @JsonManagedReference 
+    @JsonIgnore
     private List<Chunk> chunks = new ArrayList<>();
 
     public Document(String filename, String contentType, Long fileSize, Course course) {
