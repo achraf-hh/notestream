@@ -70,10 +70,6 @@ public class DocumentIngestionService {
                     .map(Chunk::getContent)
                     .toList());
 
-            if (embeddings.size() != savedChunks.size()) {
-                throw new IllegalStateException("Embedding count does not match saved chunk count");
-            }
-
             for (int i = 0; i < savedChunks.size(); i++) {
                 savedChunks.get(i).setEmbedding(embeddings.get(i));
             }

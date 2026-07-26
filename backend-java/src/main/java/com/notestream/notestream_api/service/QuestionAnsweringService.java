@@ -16,6 +16,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Arrays;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -47,7 +48,7 @@ public class QuestionAnsweringService {
 
     @Transactional
     public QuestionResponse askQuestion(Long courseId, String rawQuestion) {
-        String questionText = normalizeQuestion(rawQuestion);
+        String questionText = rawQuestion.trim();
         Course course = courseRepository.findById(courseId)
                 .orElseThrow(() -> new EntityNotFoundException("Course not found: " + courseId));
 
@@ -97,7 +98,7 @@ public class QuestionAnsweringService {
 
         return chunkRepository.findSimilarChunks(
                 courseId,
-                toVectorLiteral(embeddings.get(0)),
+                Arrays.toString(embeddings.get(0)),
                 retrievalLimit
         );
     }
@@ -117,29 +118,5 @@ public class QuestionAnsweringService {
         return validIndices.stream()
                 .map(retrievedChunks::get)
                 .toList();
-    }
-
-    private String toVectorLiteral(float[] embedding) {
-        StringBuilder builder = new StringBuilder("[");
-        for (int i = 0; i < embedding.length; i++) {
-            if (i > 0) {
-                builder.append(',');
-            }
-            builder.append(embedding[i]);
-        }
-        return builder.append(']').toString();
-    }
-
-    private String normalizeQuestion(String rawQuestion) {
-        if (rawQuestion == null) {
-            throw new IllegalArgumentException("Question must not be null");
-        }
-
-        String normalized = rawQuestion.trim();
-        if (normalized.isEmpty()) {
-            throw new IllegalArgumentException("Question must not be blank");
-        }
-
-        return normalized;
     }
 }
