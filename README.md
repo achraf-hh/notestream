@@ -6,15 +6,18 @@ I built it to get hands-on with vector search and to keep a Java service and a P
 
 ## How it fits together
 
-```text
-   PDF upload / questions
-            |
-            v
-   Java API (Spring Boot, :8080)  ----->  Postgres + pgvector (:5432)
-            |                                   stores chunks + embeddings
-            |  /embed, /ask
-            v
-   AI service (FastAPI, :8000)  ----->  OpenAI API
+```mermaid
+flowchart LR
+    user([User])
+    api["Java API<br/>Spring Boot, :8080"]
+    ai["AI service<br/>FastAPI, :8000"]
+    db[("Postgres + pgvector<br/>:5432")]
+    openai[["OpenAI API"]]
+
+    user -->|upload PDF / ask question| api
+    api -->|store chunks + embeddings<br/>cosine search| db
+    api -->|/embed, /ask| ai
+    ai -->|embeddings + answers| openai
 ```
 
 - **Java API** handles courses, PDF ingestion, and the question/answer flow. It parses PDFs, stores chunks, and runs the vector similarity search.
