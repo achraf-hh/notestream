@@ -13,6 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 
@@ -53,13 +54,32 @@ public class DocumentIngestionService {
         );
         final Document savedDocument = documentRepository.save(document);
 
-        // 3. Stream text chunks directly from the PDF and persist as we go to avoid heap blowups
+        // 3. Stream text chunks directly from the PDF and persist as we go
         final AtomicInteger position = new AtomicInteger(0);
+        final List<Chunk> savedChunks = new ArrayList<>();
         pdfParsingService.streamChunks(file, chunkText ->
-                chunkRepository.save(new Chunk(chunkText, position.getAndIncrement(), savedDocument)));
+                savedChunks.add(chunkRepository.save(new Chunk(
+                        chunkText,
+                        position.getAndIncrement(),
+                        savedDocument
+                ))));
 
-        // TODO: Step 4 - Revisit embeddings: either batch chunks or stream to aiClient.embed()
-        // and persist embeddings alongside chunk content.
+        // 4. Generate embeddings for similarity search and persist them on the saved chunks.
+        if (!savedChunks.isEmpty()) {
+            List<float[]> embeddings = aiClient.embed(savedChunks.stream()
+                    .map(Chunk::getContent)
+                    .toList());
+
+            if (embeddings.size() != savedChunks.size()) {
+                throw new IllegalStateException("Embedding count does not match saved chunk count");
+            }
+
+            for (int i = 0; i < savedChunks.size(); i++) {
+                savedChunks.get(i).setEmbedding(embeddings.get(i));
+            }
+
+            chunkRepository.saveAll(savedChunks);
+        }
 
         return savedDocument;
     }

@@ -18,6 +18,7 @@ public interface ChunkRepository extends JpaRepository<Chunk, Long> {
         SELECT c.* FROM chunks c
         JOIN documents d ON c.document_id = d.id
         WHERE d.course_id = :courseId
+          AND c.embedding IS NOT NULL
         ORDER BY c.embedding <=> CAST(:embedding AS vector)
         LIMIT :limit
         """, nativeQuery = true)
