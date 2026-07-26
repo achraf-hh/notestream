@@ -36,6 +36,8 @@ dependencies {
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 	implementation("org.hibernate.orm:hibernate-vector:6.6.11.Final")
 	implementation("org.apache.pdfbox:pdfbox:3.0.3")
+	implementation("org.flywaydb:flyway-core")
+	implementation("org.flywaydb:flyway-database-postgresql")
 }
 
 tasks.withType<Test> {

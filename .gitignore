@@ -6,6 +6,11 @@
 # Env / secrets
 .env
 .env.*
+!.env.example
+!**/.env.example
+
+# Python venv (this project used a non-standard name)
+myenv/
 
 # Logs
 *.log
