@@ -31,7 +31,7 @@ public class Chunk {
     @Column(name = "end_page")
     private Integer endPage;
 
-    // Vector embedding for similarity search (1536 dimensions for OpenAI ada-002) and it must match the number used in any other model 
+    // Vector embedding for similarity search (1536 dimensions for OpenAI text-embedding-3-small) and it must match the number used in any other model
     @Column(name = "embedding")
     @JdbcTypeCode(SqlTypes.VECTOR)
     @Array(length = 1536)

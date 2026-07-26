@@ -11,7 +11,7 @@ class Settings(BaseSettings):
     openai_api_key: str
 
     # Models
-    embedding_model: str = "text-embedding-ada-002"
+    embedding_model: str = "text-embedding-3-small"
     llm_model: str = "gpt-4o-mini"
 
     # Server

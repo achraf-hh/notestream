@@ -18,7 +18,7 @@ class EmbeddingService:
             texts: List of strings to embed
             
         Returns:
-            List of embeddings (each is 1536 floats for ada-002)
+            List of embeddings (each is 1536 floats for text-embedding-3-small)
         """
         response = self.client.embeddings.create(
             model=self.model,
