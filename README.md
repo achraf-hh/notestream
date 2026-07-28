@@ -32,7 +32,7 @@ You only need Docker. No local Java, Python, or Postgres install.
 
 ```bash
 git clone <repo-url>
-cd notestream_clean
+cd notestream
 cp .env.example .env        # then put a real OpenAI key in it
 docker compose up --build
 ```
