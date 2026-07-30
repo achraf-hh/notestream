@@ -2,9 +2,11 @@ package com.notestream.notestream_api.integration;
 
 import org.springframework.http.MediaType;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.client.JdkClientHttpRequestFactory;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestClient;
 
+import java.net.http.HttpClient;
 import java.util.List;
 
 @Component
@@ -13,8 +15,13 @@ public class AiClient {
     private final RestClient restClient;
 
     public AiClient(@Value("${ai.service.url}") String aiServiceUrl) {
+        HttpClient httpClient = HttpClient.newBuilder()
+                .version(HttpClient.Version.HTTP_1_1)
+                .build();
+
         this.restClient = RestClient.builder()
                 .baseUrl(aiServiceUrl)
+                .requestFactory(new JdkClientHttpRequestFactory(httpClient))
                 .build();
     }
 

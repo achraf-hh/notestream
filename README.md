@@ -8,16 +8,23 @@ I built it to get hands-on with vector search and to keep a Java service and a P
 
 ```mermaid
 flowchart LR
-    user([User])
+    user([User / API client])
     api["Java API<br/>Spring Boot, :8080"]
     ai["AI service<br/>FastAPI, :8000"]
     db[("Postgres + pgvector<br/>:5432")]
     openai[["OpenAI API"]]
 
-    user -->|upload PDF / ask question| api
-    api -->|store chunks + embeddings<br/>cosine search| db
-    api -->|/embed, /ask| ai
-    ai -->|embeddings + answers| openai
+    user -->|course operations<br/>PDF uploads<br/>questions| api
+    api -->|metadata<br/>answers + citations| user
+
+    api -->|store courses, documents,<br/>chunks, questions + answers<br/>run cosine search| db
+    db -->|saved data<br/>nearest chunks| api
+
+    api -->|texts for embedding<br/>question + context chunks| ai
+    ai -->|embeddings<br/>answer + citation indexes| api
+
+    ai -->|embedding requests<br/>chat requests| openai
+    openai -->|vectors<br/>generated responses| ai
 ```
 
 - **Java API** handles courses, PDF ingestion, and the question/answer flow. It parses PDFs, stores chunks, and runs the vector similarity search.
