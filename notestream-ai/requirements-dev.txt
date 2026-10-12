@@ -1,0 +1,6 @@
+# Tests, lint, and the eval scripts. The service image only installs requirements.txt.
+-r requirements.txt
+pytest==9.1.1
+ruff==0.16.10
+PyYAML==6.0.3
+psycopg[binary]==3.3.6

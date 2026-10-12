@@ -1,0 +1,13 @@
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+
+[tool.ruff]
+target-version = "py313"
+line-length = 100
+extend-exclude = ["myenv"]
+
+[tool.ruff.lint]
+# Pyflakes plus the core pycodestyle errors, and import sorting. Listed explicitly so a
+# ruff upgrade can't change what CI enforces.
+select = ["E4", "E7", "E9", "F", "I"]

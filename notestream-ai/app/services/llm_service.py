@@ -1,15 +1,14 @@
 from openai import OpenAI
 
-from app.config import settings
 from app.utils.citation_parser import parse_citations
 
 
 class LLMService:
     """Generates answers from questions using context chunks."""
     
-    def __init__(self):
-        self.client = OpenAI(api_key=settings.openai_api_key)
-        self.model = settings.llm_model
+    def __init__(self, client: OpenAI, model: str):
+        self.client = client
+        self.model = model
     
     def ask(self, question: str, context_chunks: list[str]) -> dict:
         """

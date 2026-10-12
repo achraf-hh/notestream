@@ -1,3 +1,6 @@
+from functools import lru_cache
+
+from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
@@ -7,8 +10,8 @@ class Settings(BaseSettings):
         env_file_encoding="utf-8",
     )
 
-    # OpenAI
-    openai_api_key: str
+    # OpenAI. min_length rejects the empty string docker compose passes when the key is unset.
+    openai_api_key: str = Field(min_length=1)
 
     # Models
     embedding_model: str = "text-embedding-3-small"
@@ -19,4 +22,7 @@ class Settings(BaseSettings):
     port: int = 8000
 
 
-settings = Settings()
+@lru_cache
+def get_settings() -> Settings:
+    """Load settings on first use, so importing the app doesn't require OPENAI_API_KEY."""
+    return Settings()
