@@ -1,10 +1,22 @@
-from fastapi import FastAPI, HTTPException
+from contextlib import asynccontextmanager
+from typing import Annotated
+
+from fastapi import Depends, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 
-from app.config import settings
-from app.models import EmbedRequest, EmbedResponse, AskRequest, AskResponse
+from app.config import get_settings
+from app.dependencies import get_embedding_service, get_llm_service
+from app.models import AskRequest, AskResponse, EmbedRequest, EmbedResponse
 from app.services.embedding_service import EmbeddingService
 from app.services.llm_service import LLMService
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    # Fail fast at startup when OPENAI_API_KEY is missing. Settings load lazily,
+    # so importing the app (e.g. in tests) doesn't need a key.
+    get_settings()
+    yield
 
 
 # Create FastAPI app
@@ -12,6 +24,7 @@ app = FastAPI(
     title="NoteStream AI Service",
     description="Embedding and LLM service for NoteStream RAG pipeline",
     version="1.0.0",
+    lifespan=lifespan,
 )
 
 # Allow Java backend (port 8080) to call us
@@ -22,10 +35,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Initialize services (once, at startup)
-embedding_service = EmbeddingService()
-llm_service = LLMService()
-
 
 @app.get("/health")
 def health_check():
@@ -34,7 +43,10 @@ def health_check():
 
 
 @app.post("/embed", response_model=EmbedResponse)
-def embed(request: EmbedRequest):
+def embed(
+    request: EmbedRequest,
+    embedding_service: Annotated[EmbeddingService, Depends(get_embedding_service)],
+):
     """Convert texts to embeddings."""
     try:
         embeddings = embedding_service.embed(request.texts)
@@ -44,7 +56,10 @@ def embed(request: EmbedRequest):
 
 
 @app.post("/ask", response_model=AskResponse)
-def ask(request: AskRequest):
+def ask(
+    request: AskRequest,
+    llm_service: Annotated[LLMService, Depends(get_llm_service)],
+):
     """Answer a question using provided context chunks."""
     try:
         result = llm_service.ask(request.question, request.context_chunks)
@@ -55,4 +70,6 @@ def ask(request: AskRequest):
 
 if __name__ == "__main__":
     import uvicorn
+
+    settings = get_settings()
     uvicorn.run(app, host=settings.host, port=settings.port)

@@ -24,6 +24,10 @@ repositories {
 	mavenCentral()
 }
 
+// Spring Boot 3.4 manages Testcontainers 1.20.x, which can't connect to Docker Engine 29
+// ("Could not find a valid Docker environment"). 1.21.4 can.
+extra["testcontainers.version"] = "1.21.4"
+
 dependencies {
 	implementation("org.springframework.boot:spring-boot-starter-actuator")
 	implementation("org.springframework.boot:spring-boot-starter-data-jpa")
@@ -33,6 +37,9 @@ dependencies {
 	runtimeOnly("org.postgresql:postgresql")
 	annotationProcessor("org.projectlombok:lombok")
 	testImplementation("org.springframework.boot:spring-boot-starter-test")
+	testImplementation("org.springframework.boot:spring-boot-testcontainers")
+	testImplementation("org.testcontainers:junit-jupiter")
+	testImplementation("org.testcontainers:postgresql")
 	testRuntimeOnly("org.junit.platform:junit-platform-launcher")
 	implementation("org.hibernate.orm:hibernate-vector:6.6.11.Final")
 	implementation("org.apache.pdfbox:pdfbox:3.0.3")

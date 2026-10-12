@@ -1,14 +1,12 @@
 from openai import OpenAI
 
-from app.config import settings
-
 
 class EmbeddingService:
     """Converts text into vector embeddings using OpenAI API."""
     
-    def __init__(self):
-        self.client = OpenAI(api_key=settings.openai_api_key)
-        self.model = settings.embedding_model
+    def __init__(self, client: OpenAI, model: str):
+        self.client = client
+        self.model = model
     
     def embed(self, texts: list[str]) -> list[list[float]]:
         """
