@@ -34,3 +34,12 @@ target/
 
 # Misc
 out/
+
+# Personal TODO
+TODO.md
+
+# Private learning plan
+PLAN.md
+
+# Eval: downloaded papers, ingest state, exported chunks, miss reports (local only)
+notestream-ai/eval/data/

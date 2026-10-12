@@ -1,0 +1,21 @@
+# Golden dataset v0: questions about the five papers in eval/corpus/manifest.yaml.
+# You write these (PLAN.md, M1). Check them with: python -m eval.harness.validate
+#
+# Fields
+#   id        unique, e.g. q01
+#   paper     mapreduce | gfs | dynamo | raft | zookeeper (optional for unanswerable)
+#   category  wording | paraphrase | unanswerable
+#   question  the way a student would actually ask it
+#   evidence  short, distinctive phrases copied from the paper, 45 characters max each
+#             (leave out for unanswerable questions)
+#   notes     optional
+#
+# Shape of one entry (not a real question):
+#   - id: q00
+#     paper: gfs
+#     category: wording
+#     question: "..."
+#     evidence:
+#       - "..."
+version: v0
+questions: []
